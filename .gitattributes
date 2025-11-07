@@ -1,0 +1,21 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+*.js text
+*.jsx text
+*.ts text
+*.tsx text
+*.css text
+*.html text
+*.json text
+*.md text
+*.txt text
+*.bat text eol=crlf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg binary
+*.ttf binary
+*.woff binary
+*.woff2 binary

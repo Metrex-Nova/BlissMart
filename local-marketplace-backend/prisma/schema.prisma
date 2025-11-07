@@ -1,0 +1,236 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id          Int       @id @default(autoincrement())
+  name        String?
+  phone       String    @unique
+  email       String?   @unique
+  password    String?
+  role        Role      @default(CUSTOMER)
+  isVerified  Boolean   @default(false)
+  otp         String?
+  otpExpiry   DateTime?
+  fcmToken    String?
+  preferredLat Float?
+  preferredLng Float?
+  notificationPrefs Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  shops       Shop[]
+  orders      Order[]   @relation("CustomerOrders", fields: [], references: [])
+  reviews     Review[]
+  cart        Cart?
+  notifications Notification[]
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  imageUrl    String?
+  unit        String
+  category    String
+  createdAt   DateTime @default(now())
+  inventories ProductInventory[]
+  reviews     Review[]
+  orderItems  OrderItem[]
+  cartItems   CartItem[]
+}
+
+model ProductInventory {
+  id             Int     @id @default(autoincrement())
+  shop           Shop    @relation(fields: [shopId], references: [id])
+  shopId         Int
+  product        Product @relation(fields: [productId], references: [id])
+  productId      Int
+  price          Float
+  stock          Int
+  wholesale      Boolean @default(false)
+  wholesalerPrice Float?
+  updatedAt      DateTime @updatedAt
+  
+  @@unique([shopId, productId])
+}
+
+model Order {
+  id          Int      @id @default(autoincrement())
+  orderNumber String   @unique
+  customer    User     @relation("CustomerOrders", fields: [customerId], references: [id])
+  customerId  Int
+  shop        Shop?    @relation(fields: [shopId], references: [id])
+  shopId      Int?
+  totalAmount Float
+  status      OrderStatus @default(PLACED)
+  paymentMode PaymentMode
+  paymentStatus PaymentStatus @default(PENDING)
+  transactionId String?
+  estimatedDelivery DateTime?
+  deliveryAddress String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  items       OrderItem[]
+  tracking    Tracking?
+  wholesalerId  Int?
+  orderType     OrderType @default(CUSTOMER_ORDER)
+}
+
+model OrderItem {
+  id         Int     @id @default(autoincrement())
+  order      Order   @relation(fields: [orderId], references: [id])
+  orderId    Int
+  product    Product @relation(fields: [productId], references: [id])
+  productId  Int
+  shop       Shop    @relation(fields: [shopId], references: [id])
+  shopId     Int
+  quantity   Int
+  unitPrice  Float
+  subtotal   Float
+}
+
+model Shop {
+  id          Int          @id @default(autoincrement())
+  name        String
+  ownerId     Int
+  owner       User         @relation(fields: [ownerId], references: [id])
+  type        ShopType
+  address     String
+  lat         Float?
+  lng         Float?
+  products    ProductInventory[]
+  orders      Order[]
+  orderItems  OrderItem[]
+  createdAt   DateTime     @default(now())
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+}
+
+model Tracking {
+  id        Int    @id @default(autoincrement())
+  order     Order  @relation(fields: [orderId], references: [id])
+  orderId   Int    @unique
+  status    String
+  geoLat    Float?
+  geoLng    Float?
+  updatedAt DateTime @updatedAt
+}
+
+model Cart {
+  id        Int       @id @default(autoincrement())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int       @unique
+  items     CartItem[]
+  updatedAt DateTime  @updatedAt
+}
+
+model CartItem {
+  id        Int     @id @default(autoincrement())
+  cart      Cart    @relation(fields: [cartId], references: [id])
+  cartId    Int
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  quantity  Int
+  shopId    Int
+  price     Float
+  @@unique([cartId, productId, shopId])
+}
+
+model Notification {
+  id        Int                 @id @default(autoincrement())
+  user      User                @relation(fields: [userId], references: [id])
+  userId    Int
+  title     String
+  message   String
+  type      NotificationType
+  read      Boolean             @default(false)
+  actionUrl String?
+  metadata  Json?
+  sentVia   NotificationChannel @default(IN_APP)
+  createdAt DateTime            @default(now())
+}
+
+// ============================================
+// ENUMS (MUST BE AT BOTTOM)
+// ============================================
+
+enum NotificationChannel {
+  IN_APP
+  FCM_PUSH
+  SMS
+  EMAIL
+}
+
+enum NotificationType {
+  ORDER_UPDATE
+  ORDER_PLACED
+  ORDER_CONFIRMED
+  ORDER_DISPATCHED
+  ORDER_DELIVERED
+  PAYMENT_CONFIRMATION
+  PAYMENT_FAILED
+  DELIVERY_REMINDER
+  STOCK_ALERT
+  LOW_STOCK
+  RESTOCK_ALERT
+  PROMOTIONAL
+  NEW_PRODUCT
+  WHOLESALER_ORDER
+  FEEDBACK_REQUEST
+}
+
+enum OrderType {
+  CUSTOMER_ORDER
+  RETAILER_ORDER
+}
+
+enum Role {
+  CUSTOMER
+  RETAILER
+  WHOLESALER
+  ADMIN
+}
+
+enum ShopType {
+  RETAIL
+  WHOLESALE
+}
+
+enum OrderStatus {
+  PLACED
+  CONFIRMED
+  PACKED
+  DISPATCHED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+  RETURNED
+}
+
+enum PaymentMode {
+  COD
+  UPI
+  CARD
+  WALLET
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
