@@ -54,7 +54,7 @@ async function testDatabaseConnection() {
 
 // CORS Middleware - Allow requests from frontend and production
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://bliss-mart.vercel.app'],
+  origin: ['http://localhost:3000', 'https://bliss-mart.vercel.app', 'https://blissmart-1.onrender.com'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
