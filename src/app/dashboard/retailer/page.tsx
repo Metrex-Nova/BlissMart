@@ -78,8 +78,7 @@ interface User {
 export default function RetailerDashboard() {
   const router = useRouter();
 
-  // ✅ FIX #1: Get API URL at component level
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_URL = 'https://blissmart-1.onrender.com';
 
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);

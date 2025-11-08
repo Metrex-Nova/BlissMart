@@ -2,9 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-const API_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://blissmart-1.onrender.com'
-  : 'http://localhost:4000';
+const API_URL = 'https://blissmart-1.onrender.com';
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);

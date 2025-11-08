@@ -83,7 +83,7 @@ export default function WholesalerDashboard() {
   const [success, setSuccess] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+  const API_URL = 'https://blissmart-1.onrender.com';
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -205,14 +205,14 @@ export default function WholesalerDashboard() {
       }
 
       setSuccess('Product added successfully');
-      setFormData({ 
-        name: '', 
-        category: 'General', 
+      setFormData({
+        name: '',
+        category: 'General',
         unit: 'kg',
-        price: '', 
+        price: '',
         wholesalerPrice: '',
-        stock: '', 
-        description: '' 
+        stock: '',
+        description: ''
       });
       setShowAddProduct(false);
       fetchProducts();
@@ -333,11 +333,11 @@ export default function WholesalerDashboard() {
             </div>
 
             <div className="flex items-center gap-6">
-              <NotificationCenter 
-                userId={user?.id || 0} 
-                token={localStorage.getItem('token') || ''} 
+              <NotificationCenter
+                userId={user?.id || 0}
+                token={localStorage.getItem('token') || ''}
               />
-              
+
               <div className="text-right border-r border-gray-200 pr-6">
                 <p className="text-sm text-gray-500">Wholesaler</p>
                 <p className="font-medium text-gray-900">{user?.name}</p>
@@ -384,11 +384,10 @@ export default function WholesalerDashboard() {
             <button
               key={tab}
               onClick={() => setCurrentTab(tab as any)}
-              className={`py-4 px-0 font-medium text-sm transition border-b-2 -mb-0.5 capitalize ${
-                currentTab === tab
-                  ? 'border-purple-600 text-purple-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
-              }`}
+              className={`py-4 px-0 font-medium text-sm transition border-b-2 -mb-0.5 capitalize ${currentTab === tab
+                ? 'border-purple-600 text-purple-600'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+                }`}
             >
               {tab} {tab === 'products' && `(${products.length})`} {tab === 'orders' && `(${orders.length})`}
             </button>
@@ -590,13 +589,12 @@ export default function WholesalerDashboard() {
                         <td className="px-6 py-4 text-sm font-semibold text-gray-900">₹{product.price}</td>
                         <td className="px-6 py-4 text-sm font-semibold text-purple-600">₹{product.wholesalerPrice}</td>
                         <td className="px-6 py-4 text-sm">
-                          <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
-                            product.stock > 100
-                              ? 'bg-emerald-50 text-emerald-700'
-                              : product.stock > 0
+                          <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${product.stock > 100
+                            ? 'bg-emerald-50 text-emerald-700'
+                            : product.stock > 0
                               ? 'bg-amber-50 text-amber-700'
                               : 'bg-red-50 text-red-700'
-                          }`}>
+                            }`}>
                             {product.stock}
                           </span>
                         </td>
@@ -658,7 +656,7 @@ export default function WholesalerDashboard() {
                         <strong>Retailer:</strong> {order.customer.name} ({order.customer.phone})
                       </p>
                       <p className="text-sm text-gray-700">
-                        <strong>Payment:</strong> {order.paymentMode} - 
+                        <strong>Payment:</strong> {order.paymentMode} -
                         <span className={` font-semibold ml-1 ${order.paymentStatus === 'PAID' ? 'text-emerald-600' : 'text-red-600'}`}>
                           {order.paymentStatus}
                         </span>
@@ -685,11 +683,10 @@ export default function WholesalerDashboard() {
                             key={status}
                             onClick={() => updateOrderStatus(order.id, status)}
                             disabled={order.status === status}
-                            className={`px-3 py-2 rounded text-xs font-medium transition ${
-                              order.status === status
-                                ? 'bg-purple-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                            className={`px-3 py-2 rounded text-xs font-medium transition ${order.status === status
+                              ? 'bg-purple-600 text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              } disabled:opacity-50 disabled:cursor-not-allowed`}
                           >
                             {status === 'OUT_FOR_DELIVERY' ? 'Out 4 Del' : status.replace('_', ' ')}
                           </button>
