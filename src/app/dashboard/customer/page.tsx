@@ -6,6 +6,11 @@ import { useRouter } from 'next/navigation';
 import { LogOut, ShoppingCart, Search, Loader, RefreshCw, Package, MapPin, X, Minus, Plus } from 'lucide-react';
 import NotificationCenter from '@/components/NotificationCenter';
 
+
+const API_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://blissmart-1.onrender.com'
+  : 'http://localhost:4000';
+
 interface Product {
     id: number;
     name: string;
@@ -95,7 +100,7 @@ export default function CustomerDashboard() {
     const fetchProducts = async () => {
         try {
             setError(null);
-            const response = await fetch('http://localhost:4000/api/products');
+            const response = await fetch(`${API_URL}/api/products`);
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -115,7 +120,7 @@ export default function CustomerDashboard() {
         if (!user) return;
 
         try {
-            const response = await fetch(`http://localhost:4000/api/orders/user/${user.id}`, {
+            const response = await fetch(`${API_URL}/api/orders/user/${user.id}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
@@ -388,7 +393,7 @@ export default function CustomerDashboard() {
 
             console.log('Creating order:', orderData);
 
-            const response = await fetch('http://localhost:4000/api/orders', {
+            const response = await fetch(`${API_URL}/api/orders`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

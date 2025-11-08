@@ -12,7 +12,7 @@ export default function UPIPayment({ amount, orderId, onPaymentInitiated }: UPIP
   const [isLoading, setIsLoading] = useState(false);
 
   // Replace with your actual UPI ID
-  const YOUR_UPI_ID = 'yourupi@id'; // ← CHANGE THIS to your real UPI ID
+  const YOUR_UPI_ID = 'parasbalani748@okhdfcbank'; // ← CHANGE THIS to your real UPI ID
   const YOUR_BUSINESS_NAME = 'Local Marketplace';
 
   const generateUPILink = () => {

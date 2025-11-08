@@ -2,6 +2,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+const API_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://blissmart-1.onrender.com'
+  : 'http://localhost:4000';
+
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [step, setStep] = useState('auth'); // 'auth', 'otp-verification'
@@ -26,7 +30,7 @@ export default function AuthPage() {
     try {
       if (isLogin) {
         // LOGIN FLOW
-        const response = await fetch('http://localhost:4000/api/auth/login', {
+        const response = await fetch(`${API_URL}/api/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -53,7 +57,7 @@ export default function AuthPage() {
         }
       } else {
         // REGISTRATION FLOW
-        const response = await fetch('http://localhost:4000/api/auth/register', {
+        const response = await fetch(`${API_URL}/api/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
@@ -82,7 +86,7 @@ export default function AuthPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:4000/api/auth/verify-otp', {
+      const response = await fetch(`${API_URL}/api/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -117,7 +121,7 @@ export default function AuthPage() {
   const handleResendOTP = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:4000/api/auth/resend-otp', {
+      const response = await fetch(`${API_URL}/api/auth/resend-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId })
