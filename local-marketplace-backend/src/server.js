@@ -204,7 +204,15 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// Basic middleware FIRST
+// IMPORTANT: Render uses a specific port - use their environment variable
+const RENDER_PORT = process.env.PORT || 10000;
+
+console.log('🚀 Starting server...');
+console.log('📊 DATABASE_URL exists:', !!process.env.DATABASE_URL);
+console.log('🔐 JWT_SECRET exists:', !!process.env.JWT_SECRET);
+console.log('📍 PORT from environment:', process.env.PORT);
+
+// Middleware
 app.use(cors({
   origin: ['http://localhost:3000', 'https://bliss-mart.vercel.app', 'https://blissmart-1.onrender.com'],
   credentials: true,
@@ -215,45 +223,45 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Request logging
+// Request logging - CRITICAL for debugging
 app.use((req, res, next) => {
   console.log(`📍 ${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
+  console.log(`📍 Headers:`, req.headers);
   next();
 });
 
-// SIMPLE ROUTES FIRST - Test these work
+// SIMPLE TEST ROUTES - Define these FIRST
 app.get('/', (req, res) => {
-  res.json({ message: 'Backend is running!' });
+  console.log('✅ Root route hit!');
+  res.json({ 
+    message: 'Backend is running!', 
+    port: RENDER_PORT,
+    timestamp: new Date() 
+  });
 });
 
 app.get('/api/test', (req, res) => {
-  res.json({ message: 'Test route works!' });
+  console.log('✅ /api/test route hit!');
+  res.json({ message: 'Test route works!', timestamp: new Date() });
 });
 
 app.get('/api/simple-test', (req, res) => {
-  res.json({ message: 'Simple test works!' });
+  console.log('✅ /api/simple-test route hit!');
+  res.json({ message: 'Simple test works!', timestamp: new Date() });
 });
 
 app.post('/api/auth/simple-login', (req, res) => {
-  res.json({ message: 'Simple login works!' });
+  console.log('✅ /api/auth/simple-login POST route hit!');
+  res.json({ message: 'Simple login POST works!', timestamp: new Date() });
 });
 
-// Initialize Prisma Client
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
-
-// Health check with error handling
-app.get('/api/health', async (req, res) => {
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-    res.json({ status: 'OK', database: 'Connected' });
-  } catch (error) {
-    res.status(500).json({ status: 'ERROR', database: 'Disconnected' });
-  }
+app.get('/api/auth/simple-login', (req, res) => {
+  console.log('✅ /api/auth/simple-login GET route hit!');
+  res.json({ message: 'Simple login GET works!', timestamp: new Date() });
 });
 
-// Load other routes SYNCHRONOUSLY
-console.log('🔄 Loading routes...');
+// Load other routes
+console.log('🔄 Loading feature routes...');
 try {
   app.use('/api/auth', require('./routes/auth'));
   console.log('✅ Auth routes loaded');
@@ -266,38 +274,30 @@ try {
   console.error('❌ Route loading failed:', error);
 }
 
-// 404 Handler - MUST BE LAST
+// 404 Handler
 app.use('*', (req, res) => {
-  console.log(`❌ 404: ${req.method} ${req.originalUrl}`);
+  console.log(`❌ 404 - Route not found: ${req.method} ${req.originalUrl}`);
   res.status(404).json({ 
     error: 'Route not found', 
     path: req.originalUrl,
-    method: req.method 
+    method: req.method,
+    timestamp: new Date()
   });
 });
 
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error('Server error:', err);
-  res.status(500).json({ error: 'Internal server error' });
-});
-
-// Start server WITHOUT async database checks
-app.listen(PORT, () => {
-  console.log(`\n✅ Server running on port ${PORT}`);
-  console.log(`📍 Local: http://localhost:${PORT}`);
-  console.log(`🌐 Production: https://blissmart-1.onrender.com`);
-  console.log('🔄 Testing basic routes...');
+// Start server - Use Render's port
+app.listen(RENDER_PORT, '0.0.0.0', () => {
+  console.log(`\n🎯 SERVER STARTED SUCCESSFULLY`);
+  console.log(`📍 Running on port: ${RENDER_PORT}`);
+  console.log(`📍 Host: 0.0.0.0`);
+  console.log(`🌐 Production URL: https://blissmart-1.onrender.com`);
+  console.log(`🔗 Frontend URL: https://bliss-mart.vercel.app`);
+  console.log('\n📋 Available test routes:');
   console.log('   GET  /');
   console.log('   GET  /api/test');
   console.log('   GET  /api/simple-test');
+  console.log('   GET  /api/auth/simple-login');
   console.log('   POST /api/auth/simple-login');
-  console.log('   GET  /api/health');
 });
 
-// Handle cleanup
-process.on('SIGINT', async () => {
-  console.log('🔄 Shutting down gracefully...');
-  await prisma.$disconnect();
-  process.exit(0);
-});
+console.log('🔄 Server initialization complete');
