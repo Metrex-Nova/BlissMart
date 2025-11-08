@@ -60,6 +60,12 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`📍 ${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 // Body Parser Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -98,32 +104,17 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-// Import and use routes with error handling
-const routes = [
-  { path: '/api/auth', file: './routes/auth' },
-  { path: '/api/products', file: './routes/products' },
-  { path: '/api/cart', file: './routes/cart' },
-  { path: '/api/orders', file: './routes/orders' },
-  { path: '/api/payments', file: './routes/payments' },
-  { path: '/api/location', file: './routes/location' },
-  { path: '/api/reviews', file: './routes/reviews' },
-  { path: '/api/notifications', file: './routes/notifications' },
-  { path: '/api/retailer', file: './routes/retailer' },
-  { path: '/api/shops', file: './routes/shops' },
-  { path: '/api/wholesaler', file: './routes/wholesaler' }
-];
-
-app.post('/api/auth/debug-login', (req, res) => {
-  res.json({ message: 'Debug login works!' });
+// Simple test routes that don't depend on database
+app.get('/api/simple-test', (req, res) => {
+  res.json({ message: 'Simple route works!', time: new Date() });
 });
 
-routes.forEach(route => {
-  try {
-    app.use(route.path, require(route.file));
-    console.log(`✅ Route loaded: ${route.path}`);
-  } catch (error) {
-    console.error(`❌ Failed to load route ${route.path}:`, error.message);
-  }
+app.post('/api/auth/simple-login', (req, res) => {
+  res.json({ message: 'Simple login POST route works!' });
+});
+
+app.get('/api/auth/simple-login', (req, res) => {
+  res.json({ message: 'Simple login GET route works!' });
 });
 
 // 404 Error Handler
@@ -148,12 +139,46 @@ async function startServer() {
     console.log('🚨 Starting server without database connection - some features may not work');
   }
 
+  // ✅ MOVE ROUTE LOADING HERE - after database connection
+  console.log('🔄 Loading routes after DB connection...');
+  const routes = [
+    { path: '/api/auth', file: './routes/auth' },
+    { path: '/api/products', file: './routes/products' },
+    { path: '/api/cart', file: './routes/cart' },
+    { path: '/api/orders', file: './routes/orders' },
+    { path: '/api/payments', file: './routes/payments' },
+    { path: '/api/location', file: './routes/location' },
+    { path: '/api/reviews', file: './routes/reviews' },
+    { path: '/api/notifications', file: './routes/notifications' },
+    { path: '/api/retailer', file: './routes/retailer' },
+    { path: '/api/shops', file: './routes/shops' },
+    { path: '/api/wholesaler', file: './routes/wholesaler' }
+  ];
+
+  routes.forEach(route => {
+    try {
+      app.use(route.path, require(route.file));
+      console.log(`✅ Route loaded: ${route.path}`);
+    } catch (error) {
+      console.error(`❌ Failed to load route ${route.path}:`, error.message);
+    }
+  });
+
   app.listen(PORT, () => {
     console.log(`\n✅ Server is running on port ${PORT}`);
     console.log(`📍 Backend URL: http://localhost:${PORT}`);
     console.log(`🌐 Production URL: https://blissmart-1.onrender.com`);
     console.log(`🔗 Frontend URL: https://bliss-mart.vercel.app`);
     console.log(`🗄️ Database Status: ${dbConnected ? 'Connected ✅' : 'Disconnected ❌'}\n`);
+    
+    // Log available routes for debugging
+    console.log('🔄 Available routes:');
+    console.log('   GET  /api/simple-test');
+    console.log('   GET  /api/auth/simple-login');
+    console.log('   POST /api/auth/simple-login');
+    console.log('   GET  /api/test');
+    console.log('   GET  /api/health');
+    console.log('   GET  /');
   });
 }
 
