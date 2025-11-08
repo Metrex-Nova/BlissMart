@@ -113,6 +113,10 @@ const routes = [
   { path: '/api/wholesaler', file: './routes/wholesaler' }
 ];
 
+app.post('/api/auth/debug-login', (req, res) => {
+  res.json({ message: 'Debug login works!' });
+});
+
 routes.forEach(route => {
   try {
     app.use(route.path, require(route.file));
