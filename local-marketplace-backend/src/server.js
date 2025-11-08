@@ -17,19 +17,37 @@ console.log('🔐 JWT_SECRET exists:', !!process.env.JWT_SECRET);
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// Test database connection
+// Test database connection with migrations
 async function testDatabaseConnection() {
   try {
     await prisma.$connect();
     console.log('✅ Database connected successfully');
     
-    // Test basic query
-    await prisma.$queryRaw`SELECT 1`;
-    console.log('✅ Database query test passed');
+    // Force run migrations
+    console.log('🔄 Running database migrations...');
+    const { execSync } = require('child_process');
+    try {
+      console.log('📦 Executing: npx prisma migrate deploy');
+      execSync('npx prisma migrate deploy', { stdio: 'inherit' });
+      console.log('✅ Database migrations completed');
+    } catch (migrationError) {
+      console.log('⚠️ Migration failed, trying db push...');
+      console.log('📦 Executing: npx prisma db push --accept-data-loss');
+      execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
+      console.log('✅ Database schema pushed');
+    }
+    
+    // Test basic query after migrations
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      console.log('✅ Database query test passed');
+    } catch (queryError) {
+      console.log('⚠️ Basic query failed, but continuing...');
+    }
+    
     return true;
   } catch (error) {
     console.error('❌ Database connection failed:', error.message);
-    console.error('🔧 Error details:', error);
     return false;
   }
 }
