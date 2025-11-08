@@ -194,110 +194,142 @@
 //   process.exit(1);
 // });
 
+          // const express = require('express');
+          // const cors = require('cors');
+          // const dotenv = require('dotenv');
+
+          // // Load environment variables
+          // dotenv.config();
+
+          // const app = express();
+          // const PORT = process.env.PORT || 4000;
+
+          // // IMPORTANT: Render uses a specific port - use their environment variable
+          // const RENDER_PORT = process.env.PORT || 10000;
+
+          // console.log('🚀 Starting server...');
+          // console.log('📊 DATABASE_URL exists:', !!process.env.DATABASE_URL);
+          // console.log('🔐 JWT_SECRET exists:', !!process.env.JWT_SECRET);
+          // console.log('📍 PORT from environment:', process.env.PORT);
+
+          // // Middleware
+          // app.use(cors({
+          //   origin: ['http://localhost:3000', 'https://bliss-mart.vercel.app', 'https://blissmart-1.onrender.com'],
+          //   credentials: true,
+          //   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+          //   allowedHeaders: ['Content-Type', 'Authorization']
+          // }));
+
+          // app.use(express.json());
+          // app.use(express.urlencoded({ extended: true }));
+
+          // // Request logging - CRITICAL for debugging
+          // app.use((req, res, next) => {
+          //   console.log(`📍 ${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
+          //   console.log(`📍 Headers:`, req.headers);
+          //   next();
+          // });
+
+          // // SIMPLE TEST ROUTES - Define these FIRST
+          // app.get('/', (req, res) => {
+          //   console.log('✅ Root route hit!');
+          //   res.json({ 
+          //     message: 'Backend is running!', 
+          //     port: RENDER_PORT,
+          //     timestamp: new Date() 
+          //   });
+          // });
+
+          // app.get('/api/test', (req, res) => {
+          //   console.log('✅ /api/test route hit!');
+          //   res.json({ message: 'Test route works!', timestamp: new Date() });
+          // });
+
+          // app.get('/api/simple-test', (req, res) => {
+          //   console.log('✅ /api/simple-test route hit!');
+          //   res.json({ message: 'Simple test works!', timestamp: new Date() });
+          // });
+
+          // app.post('/api/auth/simple-login', (req, res) => {
+          //   console.log('✅ /api/auth/simple-login POST route hit!');
+          //   res.json({ message: 'Simple login POST works!', timestamp: new Date() });
+          // });
+
+          // app.get('/api/auth/simple-login', (req, res) => {
+          //   console.log('✅ /api/auth/simple-login GET route hit!');
+          //   res.json({ message: 'Simple login GET works!', timestamp: new Date() });
+          // });
+
+          // // Load other routes
+          // console.log('🔄 Loading feature routes...');
+          // try {
+          //   app.use('/api/auth', require('./routes/auth'));
+          //   console.log('✅ Auth routes loaded');
+            
+          //   app.use('/api/products', require('./routes/products'));
+          //   console.log('✅ Products routes loaded');
+            
+          //   // Add other routes as needed
+          // } catch (error) {
+          //   console.error('❌ Route loading failed:', error);
+          // }
+
+          // // 404 Handler
+          // app.use('*', (req, res) => {
+          //   console.log(`❌ 404 - Route not found: ${req.method} ${req.originalUrl}`);
+          //   res.status(404).json({ 
+          //     error: 'Route not found', 
+          //     path: req.originalUrl,
+          //     method: req.method,
+          //     timestamp: new Date()
+          //   });
+          // });
+
+          // // Start server - Use Render's port
+          // app.listen(RENDER_PORT, '0.0.0.0', () => {
+          //   console.log(`\n🎯 SERVER STARTED SUCCESSFULLY`);
+          //   console.log(`📍 Running on port: ${RENDER_PORT}`);
+          //   console.log(`📍 Host: 0.0.0.0`);
+          //   console.log(`🌐 Production URL: https://blissmart-1.onrender.com`);
+          //   console.log(`🔗 Frontend URL: https://bliss-mart.vercel.app`);
+          //   console.log('\n📋 Available test routes:');
+          //   console.log('   GET  /');
+          //   console.log('   GET  /api/test');
+          //   console.log('   GET  /api/simple-test');
+          //   console.log('   GET  /api/auth/simple-login');
+          //   console.log('   POST /api/auth/simple-login');
+          // });
+
+          // console.log('🔄 Server initialization complete');
+
+
+console.log('🚀 MINIMAL SERVER STARTING...');
+
 const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
-
-// Load environment variables
-dotenv.config();
-
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 10000;
 
-// IMPORTANT: Render uses a specific port - use their environment variable
-const RENDER_PORT = process.env.PORT || 10000;
-
-console.log('🚀 Starting server...');
-console.log('📊 DATABASE_URL exists:', !!process.env.DATABASE_URL);
-console.log('🔐 JWT_SECRET exists:', !!process.env.JWT_SECRET);
-console.log('📍 PORT from environment:', process.env.PORT);
-
-// Middleware
-app.use(cors({
-  origin: ['http://localhost:3000', 'https://bliss-mart.vercel.app', 'https://blissmart-1.onrender.com'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
+// Basic middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Request logging - CRITICAL for debugging
 app.use((req, res, next) => {
-  console.log(`📍 ${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
-  console.log(`📍 Headers:`, req.headers);
+  console.log(`🔥 ${req.method} ${req.url}`);
   next();
 });
 
-// SIMPLE TEST ROUTES - Define these FIRST
+// Simple route
 app.get('/', (req, res) => {
-  console.log('✅ Root route hit!');
-  res.json({ 
-    message: 'Backend is running!', 
-    port: RENDER_PORT,
-    timestamp: new Date() 
-  });
+  console.log('✅ ROOT ROUTE HIT!');
+  res.json({ message: 'Hello from Render!', success: true });
 });
 
 app.get('/api/test', (req, res) => {
-  console.log('✅ /api/test route hit!');
-  res.json({ message: 'Test route works!', timestamp: new Date() });
+  console.log('✅ API TEST ROUTE HIT!');
+  res.json({ message: 'API test works!', success: true });
 });
 
-app.get('/api/simple-test', (req, res) => {
-  console.log('✅ /api/simple-test route hit!');
-  res.json({ message: 'Simple test works!', timestamp: new Date() });
+// Start server
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🎯 SERVER RUNNING ON PORT ${PORT}`);
 });
 
-app.post('/api/auth/simple-login', (req, res) => {
-  console.log('✅ /api/auth/simple-login POST route hit!');
-  res.json({ message: 'Simple login POST works!', timestamp: new Date() });
-});
-
-app.get('/api/auth/simple-login', (req, res) => {
-  console.log('✅ /api/auth/simple-login GET route hit!');
-  res.json({ message: 'Simple login GET works!', timestamp: new Date() });
-});
-
-// Load other routes
-console.log('🔄 Loading feature routes...');
-try {
-  app.use('/api/auth', require('./routes/auth'));
-  console.log('✅ Auth routes loaded');
-  
-  app.use('/api/products', require('./routes/products'));
-  console.log('✅ Products routes loaded');
-  
-  // Add other routes as needed
-} catch (error) {
-  console.error('❌ Route loading failed:', error);
-}
-
-// 404 Handler
-app.use('*', (req, res) => {
-  console.log(`❌ 404 - Route not found: ${req.method} ${req.originalUrl}`);
-  res.status(404).json({ 
-    error: 'Route not found', 
-    path: req.originalUrl,
-    method: req.method,
-    timestamp: new Date()
-  });
-});
-
-// Start server - Use Render's port
-app.listen(RENDER_PORT, '0.0.0.0', () => {
-  console.log(`\n🎯 SERVER STARTED SUCCESSFULLY`);
-  console.log(`📍 Running on port: ${RENDER_PORT}`);
-  console.log(`📍 Host: 0.0.0.0`);
-  console.log(`🌐 Production URL: https://blissmart-1.onrender.com`);
-  console.log(`🔗 Frontend URL: https://bliss-mart.vercel.app`);
-  console.log('\n📋 Available test routes:');
-  console.log('   GET  /');
-  console.log('   GET  /api/test');
-  console.log('   GET  /api/simple-test');
-  console.log('   GET  /api/auth/simple-login');
-  console.log('   POST /api/auth/simple-login');
-});
-
-console.log('🔄 Server initialization complete');
+console.log('✅ server.js loaded completely');
