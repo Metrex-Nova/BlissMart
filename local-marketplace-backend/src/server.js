@@ -117,20 +117,6 @@ app.get('/api/auth/simple-login', (req, res) => {
   res.json({ message: 'Simple login GET route works!' });
 });
 
-// 404 Error Handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found', path: req.path });
-});
-
-// Global Error Handler
-app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  res.status(500).json({
-    error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
-  });
-});
-
 // Start Server with database check
 async function startServer() {
   const dbConnected = await testDatabaseConnection();
@@ -139,7 +125,7 @@ async function startServer() {
     console.log('🚨 Starting server without database connection - some features may not work');
   }
 
-  // ✅ MOVE ROUTE LOADING HERE - after database connection
+  // ✅ Load routes FIRST
   console.log('🔄 Loading routes after DB connection...');
   const routes = [
     { path: '/api/auth', file: './routes/auth' },
@@ -162,6 +148,20 @@ async function startServer() {
     } catch (error) {
       console.error(`❌ Failed to load route ${route.path}:`, error.message);
     }
+  });
+
+  // ✅ 404 Error Handler - MUST come AFTER all routes
+  app.use((req, res) => {
+    res.status(404).json({ error: 'Route not found', path: req.path });
+  });
+
+  // ✅ Global Error Handler - MUST come LAST
+  app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+    });
   });
 
   app.listen(PORT, () => {
@@ -193,4 +193,3 @@ process.on('unhandledRejection', (err) => {
   console.error('Unhandled Rejection:', err);
   process.exit(1);
 });
-
